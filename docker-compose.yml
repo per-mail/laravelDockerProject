@@ -1,0 +1,36 @@
+# источник https://www.youtube.com/watch?v=h6qwp5ySNEE&list=PLd2_Os8Cj3t9Ert8mBlNl1UqwllyP1Tm_&index=10
+
+#версия докера
+version: '3'
+
+services:
+# название сервиса 1
+    nginx:
+        image: nginx:latest
+        volumes:
+#   подключаем папку public, всё что там содержится у пути ./:/var/www/
+            - ./:/var/www
+# подключаем конфиг nginx. conf из папки /nginx/conf.d, передаём путь /etc/nginx/conf.d  папке /nginx/conf.d
+            - ./_docker/nginx/conf.d:/etc/nginx/conf.d
+        ports:
+#  8876 - внешний порт 80 - внутренний порт докера
+            - "8876:80"
+# условие запускаем app только если работает корректно работает сервис php
+        depends_on:
+            - app
+# указываем имя контейнера
+        container_name: project_nginx
+
+# название сервиса 2
+    app:
+        build:
+#  указываем путь до файла
+            context: .
+            dockerfile: _docker/app/Dockerfile
+        volumes:
+            - ./:/var/www
+        container_name: project_app
+
+
+#      docker-compose up -d
+#      docker-compose down
