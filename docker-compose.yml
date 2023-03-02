@@ -29,8 +29,33 @@ services:
             dockerfile: _docker/app/Dockerfile
         volumes:
             - ./:/var/www
+ # условие запускаем app только если работает корректно работает сервис bd
+        depends_on:
+            - bd
         container_name: project_app
+
+#  подключаем бд на основе     image: mysql:8.0
+    db:
+        image: mysql:8.0
+#  перезапускаем базу всегда когда она упала
+        restart: always
+#  указываем место где храним данные на случай если база упвла, нужно заново перезаписать её
+        volumes:
+            - ./tmp/db:/var/lib/mysql
+#  создаём переменные окружения
+        environment:
+#  название базы данных
+            MYSQL_DATABASE: lardocker
+            MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 8101:3306
+        command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+        container_name: project_db
+
 
 
 #      docker-compose up -d
 #      docker-compose down
+
+#      docker exec -it project_app bash
+#   pho artisan migrate
